@@ -6,4 +6,4 @@ These are things that I remember and don't want to forget on this project.  They
 - learning about arrays of dictionaries in python
 - send data from pi to desktop securely
 - learn about multisegment displays
--
+- continue to learn about git
