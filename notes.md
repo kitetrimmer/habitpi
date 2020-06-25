@@ -7,3 +7,6 @@ These are things that I remember and don't want to forget on this project.  They
 - send data from pi to desktop securely
 - learn about multisegment displays
 - continue to learn about git
+- need to have a way for the pi to update
+- dim displays
+- LED's to indicate whether the goal was done today or not?
