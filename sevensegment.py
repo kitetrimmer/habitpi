@@ -1,4 +1,5 @@
 # This is a function to display a character on a seven segment display
+# for documentation, see the sevensegment.md
 
 def sevensegment(ch,d,pinout):
     #ch is the character to display
@@ -31,30 +32,6 @@ def sevensegment(ch,d,pinout):
             'U': (1,4,5,6,3)
             }
 
-    """ 
-    6 = g = 0
-    13 = f = 1
-    19 = a = 2
-    26 = b = 3
-    21 = e = 4
-    20 = d = 5
-    16 = c = 6
-    12 = dp = 7
-
-       2
-    ---a---
-    |     |
-    f1    b3
-    |  0  |
-    ---g---
-    |     |
-    e4    c6
-    |  5  |
-    ---d---   dp7
-    """
-    # This is the pinout I'm using - TODO:it would be nice to be able to pass the pinouts as an argument
-    #    l=(6,13,19,26,21,20,16,12)
-
        # Validate the inputs - ch needs to be in the num dictionary, and d needs to be an integer
 
     try:
@@ -71,13 +48,10 @@ def sevensegment(ch,d,pinout):
                     raise ValueError ("GPIO pinouts must be from 1 to 26")
     except ValueError as error:
         traceback.print_exc()
-
     except TypeError as error:
         traceback.print_exc()
-    
     except IndexError as error:
         traceback.print_exc()
-
     else:
         leds = LEDBoard(*pinout)
 
