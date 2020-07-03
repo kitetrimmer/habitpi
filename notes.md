@@ -2,17 +2,17 @@
 -----------------------
 These are things that I remember and don't want to forget on this project.  They're in no particular order to start, and I may organize as I go.
 
-X Look at SQLite to see if it might work later
+[X] Look at SQLite to see if it might work later
 	This looks promising - fairly easy to use.  Need to diagram exactly what I'm thinking about.
-- learning about arrays of dictionaries in python
-- send data from pi to desktop securely
-- learn about multisegment displays
-- continue to learn about git
-- need to have a way for the pi to update
-- dim displays
-- LED's to indicate whether the goal was done today or not?
-- Figure out pinouts - do I need to learn shift registers?
-- Synch to desktop to back up data, and for data analysis.
+[ ] learning about arrays of dictionaries in python
+[ ]- send data from pi to desktop securely
+[ ]learn about multisegment displays
+[ ]continue to learn about git
+[ ]need to have a way for the pi to update
+[ ]dim displays
+[ ]LED's to indicate whether the goal was done today or not?
+[ ]Figure out pinouts - do I need to learn shift registers?
+[ ]Synch to desktop to back up data, and for data analysis.
 
 
 ## To-Do's
