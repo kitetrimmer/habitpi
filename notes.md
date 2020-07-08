@@ -1,4 +1,4 @@
-# Notes and Plans for Habit Pi
+# Notes
 -----------------------
 These are things that I remember and don't want to forget on this project.  They're in no particular order to start, and I may organize as I go.
 
