@@ -1,12 +1,19 @@
 # This will add a sample entry for testing/development it is not intended for production
 
 import sqlite3
+import datetime
 conn = sqlite3.connect('habitpi.db')
+cursor = conn.cursor()
+today = datetime.datetime.now()
 
-conn.execute("INSERT INTO HABIT1(ID,HABIT1,CONT_DAYS) \
-        VALUES (1,datetime('now','localtime,),1)");
-
-conn.execute("INSERT INTO HABIT1(ID,HABIT1,CONT_DAYS) \
-        VALUES (2,datetime('now','+1 day','localtime',2)");
+data_tuple1 = (1,today,1)
+insert_with_param = """INSERT INTO HABITS(HABIT, HABIT_DATE,CONT_DAYS) VALUES (?,?,?);"""
+cursor.execute(insert_with_param,data_tuple1)
+        
+t = today + datetime.timedelta(days=1)
+data_tuple2 = (1,t,2)
+cursor.execute(insert_with_param,data_tuple2)
+        
 conn.commit()
+conn.close()
 
