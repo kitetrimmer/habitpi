@@ -10,4 +10,6 @@ This is an interesting project to me, because I am learning so much.  So far I'v
 - Basics of Vim
 - Basics of Python
 - Some Sqlite - including date stuff, which seems very complicated to me, but I think I've almost got it.
-
+- ssh configuration
+- scp
+- basic linux CLI commands

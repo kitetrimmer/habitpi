@@ -3,7 +3,8 @@ import datetime
 #TODO: Need to see if the habitpi.db exists - if so, back it up.  If a backup exists, remove the backup, and 
 # back up the current habitpi.db
 
-conn = sqlite3.connect('habitpi.db')
+conn = sqlite3.connect('habitpi.db',
+                        detect_types = sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
 
 # Create a table for habits to be tracked.  
 # Table stores:
@@ -12,7 +13,7 @@ conn = sqlite3.connect('habitpi.db')
 # and the number of continuous days (which will be incremented as long as there is an entry for yesterday
 conn.execute('''CREATE TABLE HABITS
         (HABIT INT NOT NULL,
-        HABIT_DATE TIMESTAMP NOT NULL,
+        HABIT_DATE timestamp NOT NULL,
         CONT_DAYS INT NOT NULL);''')
         
 
