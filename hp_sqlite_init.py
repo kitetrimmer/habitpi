@@ -19,8 +19,7 @@ conn.execute('''CREATE TABLE HABITS
 
 # Table for tracking weight - simple enough, just the date and the weight.
 conn.execute('''CREATE TABLE WEIGHT
-        (ID INT PRIMARY KEY NOT NULL,
-        WDATE TIMESTAMP NOT NULL,
+        (WDATE TIMESTAMP NOT NULL,
         WEIGHT REAL NOT NULL);''')
 
 #TODO: Need to catch errors and flash codes on the LED's based on status.
