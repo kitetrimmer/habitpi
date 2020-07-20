@@ -2,6 +2,9 @@
 
 import sqlite3
 import datetime
+import os
+import time
+import shutil
 
 class color:
     PURPLE = '\033[95m'
@@ -105,12 +108,15 @@ def drop_table_menu():
         drop_habit_table()
     else:
         print("Aborting....")
-#TODO:
 def delete_habitpidb():
     # This is a function to delete the habitpi.db file
-    # TODO: Create the function
-    pass
-
+    confirm = input(color.RED + "Are you sure you want to delete habitpi.db?"+color.END)
+    if confirm == 'Y' or confirm == "y":
+        os.remove("habitpi.db")   
+        print("habitpi.db has been removed")
+        return
+    else:
+        return
 
 def create_habitdb():
 
@@ -140,23 +146,126 @@ def reinitialize():
     delete_habitpidb()
     create_habitdb()    
 
-#TODO: 
+def create_habit_table():
+    # This is a function that will create the habit table if it doesn't exist
+    
+    # create the connection to the database
+    conn = sqlite3.connect('habitpi.db',
+                        detect_types = sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
+    
+    # create a cursor, and then a query to see if the tablename exists in the database
+    c = conn.cursor()    
+    c.execute("""SELECT count(name) FROM sqlite_master WHERE type='table' AND name='HABITS'""")
+
+    d = c.fetchone()
+    #if the count is not 1, then table does not exist
+    if d[0]==1: 
+        print(color.RED+'The HABITS table already exists!'+color.END)
+        input('Press ENTER to continue')
+        return
+    else:
+    # Create a table for habits to be tracked.  
+    # Table stores:
+    # The number of the habit (should be 1-4)
+    # the date of the habit 
+    # and the number of continuous days (which will be incremented as long as there is an entry for yesterday
+        conn.execute('''CREATE TABLE IF NOT EXISTS HABITS
+            (HABIT INT NOT NULL,
+            HABIT_DATE timestamp NOT NULL,
+            CONT_DAYS INT NOT NULL);''')
+        print('Created the HABITS table')
+        input('Press ENTER to continue')
+        return
+
+def create_weight_table():
+    # This is a function that will create the weight table if it doesn't exist
+    
+    # create the connection to the database
+    conn = sqlite3.connect('habitpi.db',
+                        detect_types = sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
+    
+    # create a cursor, and then a query to see if the tablename exists in the database
+    c = conn.cursor()    
+    c.execute("""SELECT count(name) FROM sqlite_master WHERE type='table' AND name='WEIGHT'""")
+
+    d = c.fetchone()
+    #if the count is not 1, then table does not exist
+    if d[0]==1: 
+        print(color.RED+'The WEIGHT table already exists!'+color.END)
+        input('Press ENTER to continue')
+        return
+    else:
+    # Create a table for habits to be tracked.  
+    # Table stores:
+    # date of the record
+    # the weight at that date
+        conn.execute('''CREATE TABLE IF NOT EXISTS WEIGHT
+                (WDATE TIMESTAMP NOT NULL,
+                WEIGHT REAL NOT NULL);''')
+        print('Created the WEIGHT table')
+        input('Press ENTER to continue')
+        return
+
 def add_table_menu():
     #This will add individual tables if they've been dropped
-    #TODO: Create this function
-    pass
+    
+    print("---------------------")
+    print("Choose which table to add")
+    print("1. Habits")
+    print("2. Weight")
+    print("3. Both")
+    sel = int(input("Choose one: "))
 
-#TODO:
+    if sel == 1:
+        create_habit_table()
+    elif sel == 2:
+        create_weight_table()
+    elif sel == 3:
+        create_habit_table()
+        create_weight_table()
+    else:
+        return
+
 def backupdb():
     # This function will backup the habitpi.db
-    # TODO: create the function
-    pass
+    
+    filename = "habitpidbbak.db"
+    print("")
+    # Get a filename to back up to, using filename variable as default
+    fn=input(f"Please provide the filename to backup to [{filename}] :")
+    # if the user provided a filename, use it, otherwise use the default.
+    if fn != "":
+        filename = fn
+    # check to see if the filename exists.  If it does, ask if the user wants to overwrite
+    # and then overwrite if appropriate.
+    if os.path.isfile(filename):
+        print(color.RED+"Filename already exists"+color.END)
+        delfile = input("Would you like to overwrite it?")
+        if delfile == "Y" or delfile == "y":
+            shutil.copy("habitpi.db",filename)
+            print(color.GREEN)
+            print(f"habitpi.db backed up to {filename}")
+            print(color.END)
+            input("Press Enter to continue")
+            return
+        else:
+    # if the user doesn't want to overwrite, then start over and ask for another file name
+            backupdb()
+    # if the filename doesn't already exist, copy the file over.
+    else:
+        shutil.copy("habitpi.db",filename)
+        print(color.GREEN)
+        print(f"habitpi.db backed up to {filename}")
+        print(color.END)
+        input("Press Enter to continue")
+        return
 
 def db_menu():
     try:
         exit = False
 
         while exit == False:
+            os.system("clear")
             print("Testing Database Tools")
             print("----------------------")
             print("")
@@ -167,11 +276,12 @@ def db_menu():
             print("5. Add both Habit and Weight test data")
             print("6. Drop tables from Habitpi database")
             print("7. Add table to Habitpi database")
-            print("8. Exit")
+            print("8. Delete habitpi.db")
+            print("9. Exit")
             print("")
             sel = int(input("Pick an item: "))
 
-            if not(1 <= sel <= 8):
+            if not(1 <= sel <= 9):
                 raise ValueError
 
             if sel == 1:
@@ -190,6 +300,8 @@ def db_menu():
             elif sel == 7:
                 add_table_menu()
             elif sel == 8:
+                delete_habitpidb()
+            elif sel == 9:
                 exit = True
         return
     except TypeError:
