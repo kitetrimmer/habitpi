@@ -52,7 +52,8 @@ _If the tables already exist in the database, the tables will not be overwritten
 **This option will completely remove the habitpi.db file.**  
 If this option is selected, the program will end.  The next time the dbtools run, the habitpi.db will be created if it does not exist.  This could happen if the user copied the backup database back to habitpi.db.
 
-###7. Show data in database
+### 7. Show data in database
+ 
 This option will show all of the data in the database, for both the habits table and the weight table.  If the table does not exist for any reason, it will display that.  This is useful for examining what data is in the database while working on other parts of the program.
 
 ### 8. Exit
