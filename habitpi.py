@@ -103,7 +103,99 @@ def show_all_habits():
              for rows in data:
                  print(f'{rows[0]}       {rows[1].strftime("%Y-%m-%d %H:%M:%S")}   {rows[2]}')
 
-show_all_habits()
-hnum =int(input('Which habit? '))
-update_habit(hnum)
-show_all_habits()
+def show_weight():
+    # This is a function to show all of the weight data
+
+    conn = sqlite3.connect('habitpi.db',detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
+    cursor = conn.cursor()
+
+    cursor.execute("""SELECT * FROM WEIGHT;""")
+    recs = cursor.fetchall()
+    if recs == None:
+        print(color.RED + "No Weight Records" + color.END)
+    else:
+        print("Date                 Weight      Weight Change")
+        for a in range (0,len(recs)):
+            if a == 0:
+                print(recs[a][0].strftime("%Y-%m-%d"),"         ",recs[a][1],"      N/A")
+            else:
+                print(recs[a][0].strftime("%Y-%m-%d"),"         ",recs[a][1],"     ",round((recs[a][1]-recs[a-1][1]),1))
+
+def write_weight_to_db(weight):
+    #This function will write the weight information to the database
+
+    conn = sqlite3.connect('habitpi.db',detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
+    cursor = conn.cursor()
+    #build a tuple of the current datetime and the weight passed, pass this into the query, commit, and close the connection    
+    wt_tuple = (datetime.datetime.now(),weight)
+    query = """INSERT INTO WEIGHT (WDATE,WEIGHT) VALUES (?,?)"""
+    cursor.execute(query,wt_tuple)
+    conn.commit()
+    conn.close()
+
+def update_weight():
+    # This is the function to update weight
+
+    # Establish a connection to the database
+    conn=sqlite3.connect('habitpi.db',detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
+
+    # Check to see if there's been an update today
+    cursor = conn.cursor()
+    cursor.execute("""SELECT * FROM WEIGHT WHERE date(WDATE)=date('now')""")
+    cdata = cursor.fetchone()
+    print("cdata = ",cdata)
+    # If there is no record for data, simply ask for the weight and record it
+    if cdata == None:
+        weight = float(input(f"Input weight for {datetime.date.today()}: "))
+        write_weight_to_db(weight)    
+    # If there is data, ask whether to overwrite, and if so, ask for the weight,
+    # delete the record from today, and write the new record.
+    else:
+        print(f"There is already a weight of {cdata[1]} recorded for today")
+        sel = input("Would you like to overwrite this weight? ")
+        if sel == "Y" or sel == "y":
+            weight = float(input(f"Input weight for {datetime.date.now()}: "))
+            query = ("""DELETE FROM WEIGHT WHERE date(WDATE)=date('now')""")
+            cursor.execute(query)
+            cursor.commit()
+            write_weight_to_db(weight)
+    # close the connection
+    conn.close() 
+
+
+def habitpi_menu():
+    try:
+        sel = 0
+        while sel != 4:
+            
+            print("HabitPi Main Menu")
+            print("version 0.1")
+            print("-----------------")
+            print("1. Habits")
+            print("2. Weight")
+            print("3. Show Data")
+            print("4. Exit")
+            print("")
+            sel = int(input("Select One: "))
+            
+            if 1<=sel<=4:
+                if sel==1:
+                    show_all_habits()
+                    hnum =int(input('Which habit? '))
+                    update_habit(hnum)
+                    show_all_habits()
+                elif sel==2:
+                    update_weight()
+                    show_weight()
+                elif sel==3:
+                    show_all_habits()
+                    show_weight()
+            else:
+                raise ValueError
+
+    except ValueError:
+        print(color.RED + "Selection must be a number between 1 and 4" + color.END)
+        habitpi_menu()
+
+if __name__ == "__main__":
+    habitpi_menu()

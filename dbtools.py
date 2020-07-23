@@ -371,6 +371,7 @@ def db_menu():
         while exit == False:
             os.system("clear")
             print("Testing Database Tools")
+            print("Version 0.1")
             print("----------------------")
             print("")
             print("1. Backup Habitpi database")
