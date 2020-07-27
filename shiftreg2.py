@@ -86,7 +86,8 @@ def validate_pinouts(pinout,config):
 
 if __name__ == "__main__":
     #(17,27,23)
-    pinout = (17,50,23)
+    #DATA,SHIFT,LATCH
+    pinout = (23,24,25)
     try:
        p = validate_pinouts(pinout,"shiftregister")
        if not p:

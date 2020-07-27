@@ -1,3 +1,93 @@
+
+configuration of output bytes
+1       2       3       4       5       6       7       8
+LED1    LED2    LED3    LED4    DIG1    DIG2    DIG3    DIG4
+
+9       10      11      12      13      14      15      16
+SEG     SEG     SEG     SEG     SEG     SEG     SEG     SEG
+
+   SHIFT REGISTER PINOUTS
+         +---+
+     A --|   |-- DP
+     B --|   |
+     C --|   |
+     D --|   |
+     E --|   |
+     F --|   |
+     G --|   |
+         +---+
+
+         +---+
+    L3 --|   |-- L4
+    L2 --|   |
+    L1 --|   |
+  LED4 --|   |
+  LED3 --|   |
+  LED2 --|   |
+  LED1 --|   |
+         +---+
+
+    7 SEGMENT DISPLAY
+        --A--
+        |   |
+        F   B
+        |   |
+        --G--
+        |   |
+        E   C
+        |   |
+        --D--   DP
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Pinouts for the habitpi prototype boards (keeping the shift register test at the same time)
 
 SHIFT REGISTER TEST
