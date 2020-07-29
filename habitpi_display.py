@@ -148,7 +148,7 @@ def mainmenu():
                 elif sel == 3:
                     num = int(input("What number to display (0 to 9999)"))
                     habit_list = [0,0,0,0]    
-                    foursegmentdisplay(num,habitlist)
+                    foursegmentdisplay(num,habit_list)
                 elif sel == 4:
                     habit_list = habitLEDmenu()
                     num = int(input("What number to display (0 to 9999)"))
