@@ -6,13 +6,13 @@ import ast
 def send_one():
     GPIO.output(DATA,GPIO.HIGH)
     GPIO.output(CLOCK,GPIO.HIGH)
-    time.sleep(.001)
+    #time.sleep(.001)
     GPIO.output(CLOCK,GPIO.LOW)
 
 def send_zero():
     GPIO.output(DATA,GPIO.LOW)
     GPIO.output(CLOCK,GPIO.HIGH)
-    time.sleep(.001)
+    #time.sleep(.001)
     GPIO.output(CLOCK,GPIO.LOW)
 
 def latch():
@@ -27,22 +27,21 @@ def generate_numlist(digit):
                 '2':'[0,1,0,0,1,0,0,1]',
                 '3':'[0,1,1,0,0,0,0,1]',
                 '4':'[0,0,1,1,0,0,1,1]',
-                '5':'[0,1,0,0,1,0,0,0]',
-                '6':'[0,1,0,0,0,0,0,1]',
-                '7':'[0,0,0,1,1,0,1,1]',
+                '5':'[0,0,1,0,0,1,0,1]',
+                '6':'[0,0,0,0,0,1,0,1]',
+                '7':'[1,1,1,1,0,0,0,1]',
                 '8':'[0,0,0,0,0,0,0,1]',
-                '9':'[0,0,0,0,1,0,0,1]',
-                '0':'[0,0,0,0,0,0,1,1]'
+                '9':'[0,0,1,0,0,0,0,1]',
+                '0':'[1,0,0,0,0,0,0,1]',
+                ' ':'[1,1,1,1,1,1,1,1]'
                 }
     #TODO: Add alpha characters
-    digit_list = num_dict[str(digit)]
+    digit_list = num_dict[digit]
     #TODO: Need to catch invalid values, and think about converting only numbers to strings.
     return digit_list
 
 def habitLEDmenu():
     habit_list = [0,0,0,0]
-    digit_list = [0,0,0,0]
-    number_list = [0,0,0,0,0,0,0,0]
     for habit in range(0,4):
         sel = ''
         sel = input(f"Light up LED {habit}?")
@@ -50,11 +49,7 @@ def habitLEDmenu():
             habit_list[habit] = 1
         else:
             habit_list[habit] = 0
-    print(habit_list)
-    print("output list = ",habit_list+digit_list+number_list)
-    print("")
-    final_list = habit_list + digit_list + number_list    
-    return final_list
+    return habit_list
 
 def digitmenu():
     try:
@@ -63,26 +58,64 @@ def digitmenu():
         digit_list = [1,0,0,0]
         sel = int(input("Pick a number from 0-9 to display on the first digit: "))
         if 0<=sel<=9:
-            number_str = generate_numlist(sel)
+            number_str = generate_numlist(str(sel))
             number_list= ast.literal_eval(number_str)  #I might be able to return a list from generate_numlist - might have to check that.
         else:
             raise ValueError
         
-        print('numberlist = ',number_list)
-        print('List to send:')
         whole_list = habit_list + digit_list + number_list
         print(str(whole_list))
-        
+        return whole_list
+
     except ValueError:
         print("Must be from 0 to 9 inclusive")
         digitmenu()
 #    except TypeError:
 #        print("Must be a number")
 
+def display(disp_list):
+    for var in disp_list:
+            if var == 1:
+                send_one()
+            elif var == 0:
+                send_zero()
+            else:
+                raise ValueError
+    latch()
+    return
 
-def foursegmentmenu():
-    pass
 
+def foursegmentdisplay(num,habit_list):
+    try:
+        while True:
+            if 0<=num<=9999:
+                disp_string = str(num)
+                disp_string = disp_string.rjust(4, ' ')
+                for a in range(0,len(disp_string)):
+                    if a == 0:
+                        digit_list = [1,0,0,0]
+                        number_str = generate_numlist(disp_string[a])
+                        number_list=ast.literal_eval(number_str)
+                    elif a == 1:
+                        digit_list = [0,1,0,0]
+                        number_str = generate_numlist(disp_string[a])
+                        number_list=ast.literal_eval(number_str)
+                    elif a == 2:
+                        digit_list = [0,0,1,0]
+                        number_str = generate_numlist(disp_string[a])
+                        number_list=ast.literal_eval(number_str)
+                    elif a == 3:
+                        digit_list = [0,0,0,1]
+                        number_str = generate_numlist(disp_string[a])
+                        number_list=ast.literal_eval(number_str)
+                    else:
+                        print("too many digits")
+                    disp_list = habit_list + digit_list + number_list
+                    display(disp_list)
+                    time.sleep(.0005)
+    except:
+        display([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+        return
 
 def mainmenu():
     try:
@@ -101,19 +134,28 @@ def mainmenu():
 
             if 0 <= sel <=5:
                 if sel == 1:
-                    disp_list = habitLEDmenu()
+                    habit_list = habitLEDmenu()
+                    digit_list = [0,0,0,0]
+                    number_list = [0,0,0,0,0,0,0,0]
+                    disp_list = habit_list+digit_list+number_list
+                    display(disp_list)
                 elif sel == 2:
-                    digitmenu()
+                    habit_list = [0,0,0,0]
+                    digit_list = [1,0,0,0]
+                    number_list = digitmenu()
+                    disp_list = habit_list+digit_list+number_list
+                    display(disp_list)
                 elif sel == 3:
-                    foursegmentmenu()
+                    num = int(input("What number to display (0 to 9999)"))
+                    habit_list = [0,0,0,0]    
+                    foursegmentdisplay(num,habitlist)
                 elif sel == 4:
-                    habitledmenu()
-                    foursegmentmenu()
+                    habit_list = habitLEDmenu()
+                    num = int(input("What number to display (0 to 9999)"))
+                    foursegmentdisplay(num,habit_list)
             else:
                 raise ValueError
 
-            print("display list = ",disp_list)
-            print("type = ",type(disp_list))
     except ValueError:
         print("Selection must be between 1 and 5")
         mainmenu()
@@ -122,31 +164,19 @@ def mainmenu():
 #        mainmenu()
 
 if __name__ == '__main__':
-
+    # get the list from mainment()
     config = configparser.ConfigParser()
     config.read('habitpi.conf')
 
-    try:
-        # get the list from mainment()
-        mainmenu() 
+    GPIO.setwarnings(False)
+    GPIO.setmode(GPIO.BCM)
+
+    CLOCK = config['Pinouts'].getint('Clock')
+    DATA = config['Pinouts'].getint('Data')
+    LATCH = config['Pinouts'].getint('Latch')
+
+    GPIO.setup(DATA,GPIO.OUT)
+    GPIO.setup(CLOCK,GPIO.OUT)
+    GPIO.setup(LATCH,GPIO.OUT)
+    mainmenu() 
         
-        GPIO.setwarnings(False)
-        GPIO.setmode(GPIO.BCM)
-
-        CLOCK = config['Pinouts'].getint('Clock')
-        DATA = config['Pinouts'].getint('Data')
-        LATCH = config['Pinouts'].getint('Latch')
-
-        GPIO.setup(DATA,GPIO.OUT)
-        GPIO.setup(CLOCK,GPIO.OUT)
-        GPIO.setup(LATCH,GPIO.OUT)
-
-# Migrate this code to a display function that gets a list 
-    #    for var in led_dict[choice]:
-    #        if var == 1:
-    #            send_one()
-    #        elif var == 0:
-    #            send_zero()
-    #        else:
-    #            raise ValueError
-    #    latch()
