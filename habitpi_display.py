@@ -1,26 +1,56 @@
+# habitpi_display.py: an application to test the displays for the habitpi project
+# Copyright (C) 2020 Jason A. Bright
+
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+# Contact Jason Bright at <jay><ay><bee><dot>kitetrimmer@gmail.com
+
+# Some basic concepts:
+# There are 2 595 shift registers that drive a 4 digit 7 segment display, and 4 led's.
+# These 2 bytes are broken down as follows:
+# first 4 bits: Habit List - which of the habit LED's should be lit up 
+# next 4 bits: Digit List - which digit should be lit up (used in multiplexing)
+# last 8 bits: Number List - which individual elements should be lit up to make the number
+
 import RPi.GPIO as GPIO
 import time
 import configparser
 import ast
+from os import system
 
 def send_one():
+# this will send a 1 to the 595 chips.
     GPIO.output(DATA,GPIO.HIGH)
     GPIO.output(CLOCK,GPIO.HIGH)
-    #time.sleep(.001)
     GPIO.output(CLOCK,GPIO.LOW)
 
 def send_zero():
+# sends a 0 to the 595 chips
     GPIO.output(DATA,GPIO.LOW)
     GPIO.output(CLOCK,GPIO.HIGH)
     #time.sleep(.001)
     GPIO.output(CLOCK,GPIO.LOW)
 
 def latch():
+    #latches the 595 chips to send data out to the LED's
     GPIO.output(LATCH,GPIO.HIGH)
-    time.sleep(0.001)
     GPIO.output(LATCH,GPIO.LOW)
 
 def generate_numlist(digit):
+    # Looks up a digit to return the list for the number list
+    
     # G F E D C B A DP (1 to turn off)
     num_dict = {'0':'[1,0,0,0,0,0,0,1)',
                 '1':'[1,1,1,1,0,0,1,1]',
@@ -41,6 +71,7 @@ def generate_numlist(digit):
     return digit_list
 
 def habitLEDmenu():
+    # Creates the habit list by asking the user whether to light up LED's
     habit_list = [0,0,0,0]
     for habit in range(0,4):
         sel = ''
@@ -52,6 +83,8 @@ def habitLEDmenu():
     return habit_list
 
 def digitmenu():
+    # a menu so that the user can select a digit to try for the first digit
+
     try:
         whole_list  = []
         habit_list = [0,0,0,0]
@@ -74,6 +107,8 @@ def digitmenu():
 #        print("Must be a number")
 
 def display(disp_list):
+    # takes a list and sends it to the 595 chips
+    
     for var in disp_list:
             if var == 1:
                 send_one()
@@ -84,30 +119,59 @@ def display(disp_list):
     latch()
     return
 
-
 def foursegmentdisplay(num,habit_list):
+    # takes a number from the main menu, and a habit_list to build out a display
+    # for the 4 segment display
     try:
         while True:
             if 0<=num<=9999:
+                # Turn the number into something that is usable
+
+                # turn the number into a string
                 disp_string = str(num)
-                disp_string = disp_string.rjust(4, ' ')
+                # eliminate any decimal points
+                show_string = disp_string.replace('.','')
+
+                # pad with spaces so that a 1 digit number only shows on the rightmost display
+                show_string= show_string.rjust(4, ' ')
+                # build a list that shows where the decimal places are.
+                dp_list = []
+                dp_count = 0
                 for a in range(0,len(disp_string)):
+                    if disp_string[a] == '.':
+                        dp_count += 1
+                        dp_list.append(a-dp_count)
+
+                # at this point we have a string with number to display, padded 
+                # with spaces - show_string
+                # and a list of digits that will need a decimal point - dp_list
+
+                for a in range(0,len(show_string)):
                     if a == 0:
                         digit_list = [1,0,0,0]
-                        number_str = generate_numlist(disp_string[a])
+                        number_str = generate_numlist(show_string[a])
                         number_list=ast.literal_eval(number_str)
+                        if a in dp_list:
+                            number_list[7] = 0
                     elif a == 1:
                         digit_list = [0,1,0,0]
-                        number_str = generate_numlist(disp_string[a])
+                        number_str = generate_numlist(show_string[a])
                         number_list=ast.literal_eval(number_str)
+                        if a in dp_list:
+                            number_list[7] = 0
                     elif a == 2:
                         digit_list = [0,0,1,0]
-                        number_str = generate_numlist(disp_string[a])
+                        number_str = generate_numlist(show_string[a])
                         number_list=ast.literal_eval(number_str)
+                        if a in dp_list:
+                            number_list[7] = 0
                     elif a == 3:
                         digit_list = [0,0,0,1]
-                        number_str = generate_numlist(disp_string[a])
+                        number_str = generate_numlist(show_string[a])
                         number_list=ast.literal_eval(number_str)
+                        if a in dp_list:
+                            number_list[7] = 0
+                    
                     else:
                         print("too many digits")
                     disp_list = habit_list + digit_list + number_list
@@ -118,11 +182,19 @@ def foursegmentdisplay(num,habit_list):
         return
 
 def mainmenu():
+    # This is the main menu
+
     try:
         sel = 0
         while sel != 5:
+            #system('clear')
+            print("-------------------------")
             print('habitpi display test menu')
             print('Version 0.1')
+            print('Copyright (C) 2020 Jason A Bright')
+            print('This program comes with ABSOLUTELY NO WARRANTY')
+            print('This is free software, and you are welcome to redistribute it')
+            print('For details see the license.md file')
             print('-------------------------')
             print('1. Test Habit LEDs')
             print('2. Test Individual 7 seg display (1st digit)')
@@ -146,12 +218,12 @@ def mainmenu():
                     disp_list = habit_list+digit_list+number_list
                     display(disp_list)
                 elif sel == 3:
-                    num = int(input("What number to display (0 to 9999)"))
+                    num = float(input("What number to display (0 to 9999)"))
                     habit_list = [0,0,0,0]    
                     foursegmentdisplay(num,habit_list)
                 elif sel == 4:
                     habit_list = habitLEDmenu()
-                    num = int(input("What number to display (0 to 9999)"))
+                    num = float(input("What number to display (0 to 9999)"))
                     foursegmentdisplay(num,habit_list)
             else:
                 raise ValueError
@@ -164,16 +236,21 @@ def mainmenu():
 #        mainmenu()
 
 if __name__ == '__main__':
-    # get the list from mainment()
+    # set up the outputs:
+    # 1. read in the config file
+    # 2. set up the GPIO
+    # 3. configure the pinouts
+    # 4. call the main menu
+
     config = configparser.ConfigParser()
     config.read('habitpi.conf')
 
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BCM)
 
-    CLOCK = config['Pinouts'].getint('Clock')
-    DATA = config['Pinouts'].getint('Data')
-    LATCH = config['Pinouts'].getint('Latch')
+    CLOCK = config['LEDPinouts'].getint('Clock')
+    DATA = config['LEDPinouts'].getint('Data')
+    LATCH = config['LEDPinouts'].getint('Latch')
 
     GPIO.setup(DATA,GPIO.OUT)
     GPIO.setup(CLOCK,GPIO.OUT)

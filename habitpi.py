@@ -1,3 +1,19 @@
+# This is the code to run a device to track habits and weight using a Raspberry Pi
+# Copyright (C) 2020 Jason A Bright
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 # This is the master file for habitpi python code
 
 import sqlite3
@@ -168,6 +184,11 @@ def habitpi_menu():
             system("clear")
             print(color.GREEN + "HabitPi Main Menu"+color.END)
             print("version 0.1")
+            print("Copyright (C) 2020 Jason A Bright")
+            print("This program comes wiht ABSOLUTELY NO WARRANTY;")
+            print("This is free software, and you are welcome to redistribute it under certain conditions.")
+            print("For more details, see license.md file")
+
             print("-----------------")
             print("1. Habits")
             print("2. Weight")
