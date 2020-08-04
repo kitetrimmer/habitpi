@@ -10,12 +10,9 @@ The project will implement a box.  The box will have a 16 digit display, 4 LED's
 **habitpi.py**: this will be the main code base for the project.  It is what will run to keep track of everything going on.
 **habitpi\_display.py**: This is a test program for the output of the data to the LED's.  You can test just the habit LED's, just a single number or character, the 4 segment multiplexing, or the habits an mutiplexing.
 **habitpi.conf**: This is a configuration file that stores configuration for the software.
-## Components yet to develop:
-**keypad**: Need to generate code to read input from the 16 key pad.
+**keypad**: a driver for a 4x4 matrixed keypad
 
 ## Next steps (as of July 28,2020):
-* finish the electronics on the breadboard (including soldering the leads to the keypad)
-* Develop the keypad driver
 * Start stitching things together in the habitpi.db
 * Start developing the UI - what buttons do what, etc.
 * Move the electronics off of the breadboard and onto protoboard(s)
@@ -25,3 +22,4 @@ The project will implement a box.  The box will have a 16 digit display, 4 LED's
 * Hawaiian Folk Radio (google music)
 * Essential House Radio (google music)
 * Presenting the Smiths (google music)
+* The World of the Doors (google music)

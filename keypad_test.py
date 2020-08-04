@@ -1,70 +1,53 @@
-# This is a program to test the keypad
+# This is the driver for the habitpi keypad, and code to test it.
+
+# Copyright (C) 2020 Jason A Bright
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
+# import dependencies
 import RPi.GPIO as GPIO
 import time
 import configparser
 
-def catch_key():
-    key = ''
-#    try:
-    while key == '':        
-        for a in range(0,3):
-            if a == 0:
-                GPIO.output(COL1,GPIO.HIGH)
-                if GPIO.input(ROW1):
-                    key = '1'
-                elif GPIO.input(ROW2):
-                    key = '4'
-                elif GPIO.input(ROW3):
-                    key = '7'
-                elif GPIO.input(ROW4):
-                    key = '*'
-                    
-            if a == 1:
-                GPIO.output(COL2,GPIO.HIGH)
-                if GPIO.input(ROW1):
-                    key = '2'
-                elif GPIO.input(ROW2):
-                    key = '5'
-                elif GPIO.input(ROW3):
-                    key = '8'
-                elif GPIO.input(ROW4):
-                    key = '0'
-            if a == 2:
-                GPIO.output(COL3,GPIO.HIGH)
-                if GPIO.input(ROW1):
-                    key = '3'
-                elif GPIO.input(ROW2):
-                    key = '6'
-                elif GPIO.input(ROW3):
-                    key = '9'
-                elif GPIO.input(ROW4):
-                    key = '#'
-            
-            if a == 3:
-                GPIO.output(COL4,GPIO.HIGH)
-                if GPIO.input(ROW1):
-                    key = 'A'
-                elif GPIO.input(ROW2):
-                    key = 'B'
-                elif GPIO.input(ROW3):
-                    key = 'C'
-                elif GPIO.input(ROW4):
-                    key = 'D'
-    print(" Key Pressed = ",key)
-    time.sleep(1)
-    catch_key()
-    
-#    except:
-#        print("error")
+def poll_keypad():
+    # This function will return the key that has been pressed
 
+    # dictionary of buttons based on "coordinates"
+    button = {(0,0):'1',
+              (0,1):'2',
+              (0,2):'3',
+              (0,3):'A',
+              (1,0):'4',
+              (1,1):'5',
+              (1,2):'6',
+              (1,3):'B',
+              (2,0):'7',
+              (2,1):'8',
+              (2,2):'9',
+              (2,3):'C',
+              (3,0):'*',
+              (3,1):'0',
+              (3,2):'#',
+              (3,3):'D',
+              (4,4):' '}
 
-
-
-if __name__ == '__main__':
-
+    # Set up the config parser, and read in the config file
     config = configparser.ConfigParser()
     config.read('habitpi.conf')
 
+    # set up the GPIO
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BCM)
 
@@ -85,4 +68,47 @@ if __name__ == '__main__':
     GPIO.setup(ROW2,GPIO.IN)
     GPIO.setup(ROW3,GPIO.IN)
     GPIO.setup(ROW4,GPIO.IN)
-    catch_key()
+
+    # create lists so that we can iterate through them
+    cols=[COL1,COL2,COL3,COL4]
+    rows=[ROW1,ROW2,ROW3,ROW4]
+
+    # some default values - 4,4 will never be returned from the keypad
+    # so that is assigned ' ' in the dictionary, and pressed is assigned to that
+    coord = (4,4)
+    pressed = ' '
+
+   # This is the meat of the driver.
+   # 1. keep going until a button is pressed
+   # 2. iterate through the columns, setting each one to high, and then...
+   # 3. iterate through the rows, looking for a returned voltage
+   # 4. When a returned voltage is found, we know the coordinates of the button
+   #    that was pressed, so we can look that up to return the dictionary
+   # (Note, I think that I have the rows an columns switched, but it works!)
+
+    while pressed == ' ':
+        for col in range(0,len(cols)):
+            GPIO.output(cols[col],GPIO.HIGH)
+            for row in range(0,len(rows)):
+                if GPIO.input(rows[row]):
+                    coord = (col,row)
+            GPIO.output(cols[col],GPIO.LOW)
+            pressed = button[coord]
+            time.sleep(.05)
+    return pressed
+
+if __name__ == '__main__':
+    pressed_button = None
+    print("Keypad Test v0.1")
+    print("Copyright (C) 2020 Jason Bright")
+    print("This program comes with ABSOLUTELY NO WARRANTY")
+    print("For details, see the license.md file")
+    print("This is free software, and you are welcome to redistribute it under certain conditions")
+    print("--------------------------------------------------------------------------------------")
+    print("")
+    print("Press D on the keypad to end")
+    
+    while pressed_button != 'D':
+        pressed_button = poll_keypad()
+        print ("Returned button = ",pressed_button)
+
