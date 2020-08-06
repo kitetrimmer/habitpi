@@ -97,6 +97,13 @@ def poll_keypad():
             time.sleep(.05)
     return pressed
 
+def fourdigitinput():
+    num = []
+    for digit in range(4):
+        num.append(poll_keypad())
+    num = ''.join(num)
+    return num
+
 if __name__ == '__main__':
     pressed_button = None
     print("Keypad Test v0.1")
@@ -106,9 +113,16 @@ if __name__ == '__main__':
     print("This is free software, and you are welcome to redistribute it under certain conditions")
     print("--------------------------------------------------------------------------------------")
     print("")
-    print("Press D on the keypad to end")
-    
-    while pressed_button != 'D':
-        pressed_button = poll_keypad()
-        print ("Returned button = ",pressed_button)
-
+    print("1. Single Digit Poll")
+    print("2. Four Digit Poll")
+    print("")
+    sel = input("Selection: ")
+    if sel == '1':
+        print("Press D on the keypad to end")
+        
+        while pressed_button != 'D':
+            pressed_button = poll_keypad()
+            print ("Returned button = ",pressed_button)
+    elif sel == '2':
+        num = fourdigitinput()
+        print(num)

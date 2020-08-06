@@ -50,12 +50,14 @@ def setup_GPIO():
 
 def send_one():
 # this will send a 1 to the 595 chips.
+    setup_GPIO()
     GPIO.output(DATA,GPIO.HIGH)
     GPIO.output(CLOCK,GPIO.HIGH)
     GPIO.output(CLOCK,GPIO.LOW)
 
 def send_zero():
 # sends a 0 to the 595 chips
+    setup_GPIO()
     GPIO.output(DATA,GPIO.LOW)
     GPIO.output(CLOCK,GPIO.HIGH)
     #time.sleep(.001)
@@ -63,6 +65,7 @@ def send_zero():
 
 def latch():
     #latches the 595 chips to send data out to the LED's
+    setup_GPIO()
     GPIO.output(LATCH,GPIO.HIGH)
     GPIO.output(LATCH,GPIO.LOW)
 
@@ -277,24 +280,5 @@ def mainmenu():
 #        mainmenu()
 
 if __name__ == '__main__':
-    # set up the outputs:
-    # 1. read in the config file
-    # 2. set up the GPIO
-    # 3. configure the pinouts
-    # 4. call the main menu
-
-    config = configparser.ConfigParser()
-    config.read('habitpi.conf')
-
-    GPIO.setwarnings(False)
-    GPIO.setmode(GPIO.BCM)
-
-    CLOCK = config['LEDPinouts'].getint('Clock')
-    DATA = config['LEDPinouts'].getint('Data')
-    LATCH = config['LEDPinouts'].getint('Latch')
-
-    GPIO.setup(DATA,GPIO.OUT)
-    GPIO.setup(CLOCK,GPIO.OUT)
-    GPIO.setup(LATCH,GPIO.OUT)
     mainmenu() 
        
